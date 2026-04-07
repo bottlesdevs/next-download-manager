@@ -1,6 +1,7 @@
 # next-download-manager
 
-A small async download manager for Rust built on `reqwest` + `tokio`.  
+A small async download manager for Bottles Next written in Rust, built with `reqwest` and `tokio`.  
+
 It provides a simple high-level API to schedule downloads with a global concurrency limit, per-download progress and events, cooperative cancellation, retries with exponential backoff, and basic probing (HEAD) to discover remote metadata.
 
 ## Key features
