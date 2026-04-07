@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use download_manager::{DownloadManager, prelude::*};
+use bottles_download_manager::{DownloadManager, prelude::*};
 use futures_util::StreamExt;
 use reqwest::Url;
 // use std::fmt::Debug;
