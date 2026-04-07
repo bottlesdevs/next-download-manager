@@ -3,10 +3,7 @@ use crate::{
     scheduler::SchedulerCmd,
 };
 use derive_builder::Builder;
-use reqwest::{
-    Url,
-    header::{HeaderMap, IntoHeaderName},
-};
+use http::{HeaderMap, header::IntoHeaderName};
 use std::{
     path::{Path, PathBuf},
     sync::Arc,
@@ -14,6 +11,7 @@ use std::{
 use tokio::sync::{mpsc, oneshot, watch};
 use tokio_util::sync::CancellationToken;
 use tracing::{debug, instrument, trace};
+use url::Url;
 
 /// Immutable description of a single download request.
 ///
@@ -157,7 +155,7 @@ impl RequestBuilder {
 
     /// Convenience for setting the User-Agent header.
     pub fn user_agent(self, user_agent: impl AsRef<str>) -> Self {
-        self.header(reqwest::header::USER_AGENT, user_agent)
+        self.header(http::header::USER_AGENT, user_agent)
     }
 
     /// Control whether an existing destination file may be overwritten.

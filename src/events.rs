@@ -1,10 +1,10 @@
 use crate::DownloadID;
 use crate::download::RemoteInfo;
-use reqwest::Url;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 use tokio::sync::broadcast;
 use tracing::{debug, warn};
+use url::Url;
 
 #[derive(Debug, Clone)]
 pub(crate) struct EventBus(broadcast::Sender<Event>);
