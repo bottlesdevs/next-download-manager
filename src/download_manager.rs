@@ -26,7 +26,7 @@ use futures_core::Stream;
 use prelude::*;
 use reqwest::Url;
 use std::{
-    path::Path,
+    path::{Path, PathBuf},
     sync::{Arc, atomic::Ordering},
 };
 use tokio::sync::{broadcast, mpsc};
@@ -86,6 +86,40 @@ impl DownloadManager {
         );
 
         manager
+    }
+
+    /// Enqueue multiple downloads at once, returning one [`Download`] handle per entry.
+    ///
+    /// Each item is a `(url, destination)` pair:
+    /// - When `destination` is `Some`, it is used as-is.
+    /// - When `destination` is `None`, the filename is inferred from the last non-empty
+    ///   path segment of the URL (e.g. `"archive.tar.gz"` from
+    ///   `https://example.com/files/archive.tar.gz`). Falls back to `"download"` when
+    ///   the URL has no usable path segment.
+    ///
+    /// Downloads are enqueued independently — a failure on one entry (e.g. the manager
+    /// has been shut down) does not prevent the remaining entries from being enqueued.
+    /// Inspect each [`anyhow::Result`] individually.
+    #[instrument(level = "info", skip(self, items), fields(count))]
+    pub fn enqueue_many<P, I>(&self, items: I) -> Vec<anyhow::Result<Download>>
+    where
+        P: AsRef<Path>,
+        I: IntoIterator<Item = (Url, Option<P>)>,
+    {
+        let items: Vec<_> = items.into_iter().collect();
+        tracing::Span::current().record("count", items.len());
+        debug!(count = items.len(), "Enqueuing batch of downloads");
+
+        items
+            .into_iter()
+            .map(|(url, destination)| {
+                let destination = match destination {
+                    Some(p) => p.as_ref().to_path_buf(),
+                    None => PathBuf::from(filename_from_url(&url)),
+                };
+                self.download(url, destination)
+            })
+            .collect()
     }
 
     /// Start a download with default request settings.
@@ -200,6 +234,22 @@ impl DownloadManager {
         self.tracker.wait().await;
         info!("DownloadManager shutdown complete");
     }
+}
+
+/// Derive a filename from a URL's path by taking the last non-empty path segment.
+///
+/// The segment is used as-is (percent-encoded). For the vast majority of download
+/// URLs the filename is plain ASCII, so no decoding is needed in practice.
+///
+/// Examples:
+/// - `https://example.com/files/archive.tar.gz` → `"archive.tar.gz"`
+/// - `https://cdn.example.com/v2/release/`      → `"release"` (trailing slash ignored)
+/// - `https://example.com`                       → `"download"` (no path)
+fn filename_from_url(url: &Url) -> String {
+    url.path_segments()
+        .and_then(|segments| segments.rev().find(|s| !s.is_empty()))
+        .unwrap_or("download")
+        .to_owned()
 }
 
 #[derive(Builder)]
