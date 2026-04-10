@@ -54,3 +54,8 @@ The crate uses `tracing` for structured logs. Attach a subscriber in your binary
 ## License
 
 This crate is GPL-3.0 (see `LICENSE`).
+
+## Development Documentation
+
+For comprehensive developer documentation covering architecture, core concepts, 
+mutability explanations, and use cases, see the [docs/](docs/) directory.
