@@ -1,7 +1,16 @@
 [package]
-name = "bottles-download-manager"
-version = "0.1.0"
+name = "download-manager"
+description = "A small async download manager for Bottles Next written in Rust, built with reqwest and tokio."
+version.workspace = true
+authors.workspace = true
 edition.workspace = true
+license.workspace = true
+repository = "https://github.com/bottlesdevs/next-download-manager"
+homepage = ""
+categories = [""]
+keywords = [""]
+exclude = [""]
+readme = "README.md"
 
 [lib]
 path = "src/download_manager.rs"
