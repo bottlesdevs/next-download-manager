@@ -15,13 +15,23 @@ readme = "README.md"
 [lib]
 path = "src/download_manager.rs"
 
+[features]
+default = ["reqwest"]
+reqwest = ["dep:reqwest"]
+
 [dependencies]
-reqwest.workspace = true
+reqwest = { workspace = true, optional = true }
+
 tokio.workspace = true
 tokio-stream.workspace = true
 tokio-util.workspace = true
 futures-core.workspace = true
 futures-util.workspace = true
+
+url.workspace = true
+http.workspace = true
+bytes.workspace = true
+
 thiserror.workspace = true
 anyhow.workspace = true
 derive_builder.workspace = true

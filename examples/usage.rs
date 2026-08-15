@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use bottles_download_manager::{DownloadManager, prelude::*};
 use futures_util::StreamExt;
-use reqwest::Url;
+use url::Url;
 // use std::fmt::Debug;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
